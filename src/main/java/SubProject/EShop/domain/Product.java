@@ -1,6 +1,6 @@
 package SubProject.EShop.domain;
 
-import exception.SoldOutException;
+import SubProject.EShop.exception.SoldOutException;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;

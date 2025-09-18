@@ -1,4 +1,4 @@
-package exception;
+package SubProject.EShop.exception;
 
 public class SoldOutException extends RuntimeException {
     public SoldOutException(String message){

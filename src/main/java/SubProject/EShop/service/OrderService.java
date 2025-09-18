@@ -5,7 +5,7 @@ import SubProject.EShop.domain.Product;
 import SubProject.EShop.dto.OrderRequestDto;
 import SubProject.EShop.repository.OrderRepository;
 import SubProject.EShop.repository.ProductRepository;
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;

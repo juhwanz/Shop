@@ -36,6 +36,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	//Redisson(전문 해결사) 추가
 	implementation 'org.redisson:redisson-spring-boot-starter:3.27.2'
+	//
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 }
 
 tasks.named('test') {
