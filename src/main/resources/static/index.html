@@ -2,55 +2,78 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>EShop</title>
+    <title>EShop - 통합 상품 관리</title>
     <style>
-        body {
-            font-family: sans-serif;
-            padding: 20px;
-            max-width: 600px;
-            margin: auto;
-        }.product {
-                     border: 1px solid #ccc;
-                     padding: 15px;
-                     margin-bottom: 20px;
-                     border-radius: 8px;
-                 }#log {
-                                       border: 1px solid #eee;
-                                       height: 200px;
-                                       overflow-y: scroll;
-                                       padding: 10px;
-                                       background: #f9f9f9;
-                                       font-size: 14px;
-                                       white-space: pre-wrap;
-                                   }
-       button {
-           padding: 10px 15px;
-           border: none;
-           background-color: #007bff;
-           color: white;
-           border-radius: 5px;
-           cursor: pointer;
-       }
-       button:hover {
-           background-color: #0056b3;
-       }
-
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; padding: 20px; max-width: 1000px; margin: auto; background-color: #f8f9fa; }
+        h1, h2 { border-bottom: 2px solid #dee2e6; padding-bottom: 10px; color: #343a40; }
+        .main-container { display: grid; grid-template-columns: 3fr 2fr; gap: 40px; }
+        .section { background-color: #ffffff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #dee2e6; padding: 12px; text-align: left; }
+        th { background-color: #e9ecef; }
+        button { padding: 8px 12px; border: none; color: white; border-radius: 5px; cursor: pointer; margin-right: 5px; font-size: 13px; transition: background-color 0.2s; }
+        .order-btn { background-color: #28a745; }
+        .order-btn:hover { background-color: #218838; }
+        .edit-btn { background-color: #ffc107; color: black; }
+        .edit-btn:hover { background-color: #e0a800; }
+        .delete-btn { background-color: #dc3545; }
+        .delete-btn:hover { background-color: #c82333; }
+        #log-container { margin-top: 30px; }
+        #log { border: 1px solid #dee2e6; height: 300px; overflow-y: scroll; padding: 10px; background: #ffffff; font-size: 14px; white-space: pre-wrap; }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; color: #495057; }
+        .form-group input { width: calc(100% - 18px); padding: 8px; border: 1px solid #ced4da; border-radius: 4px; }
     </style>
 </head>
 <body>
-    <h1> 실시간 재고 관리 시스템 테스트 </h1>
 
-    <div class="product">
-      <h2>상품 정도 (ID: <span id="product-id">1</span>)</h2>
-        <p><strong>상품명:</strong> <span id="product-name">로딩 중...</span></p>
-        <p><strong>가격:</strong> <span id="product-price">로딩 중...</span> 원</p>
-        <p><strong>남은 재고:</strong> <strong id="stock-quantity" style="color: blue; font-size: 1.2em;">로딩 중...</strong> 개</p>
-        <button id="order-btn">1개 주문하기 (동시 요청 테스트)</button>
+<h1>EShop 통합 관리 시스템</h1>
+
+<div class="main-container">
+    <div class="section">
+        <h2>상품 목록</h2>
+        <table>
+            <thead>
+            <tr>
+                <th>ID</th>
+                <th>상품명</th>
+                <th>가격</th>
+                <th>재고</th>
+                <th>관리</th>
+            </tr>
+            </thead>
+            <tbody id="product-list"></tbody>
+        </table>
     </div>
 
-    <h3>실시간 서버 로그</h3>
-    <div id="log"></div>
+    <div class="section">
+        <h2>상품 등록 / 수정</h2>
+        <form id="product-form">
+            <input type="hidden" id="product-id">
+            <div class="form-group">
+                <label for="name">상품명</label>
+                <input type="text" id="name" required>
+            </div>
+            <div class="form-group">
+                <label for="price">가격</label>
+                <input type="number" id="price" required>
+            </div>
+            <div class="form-group">
+                <label for="stockQuantity">재고 수량</label>
+                <input type="number" id="stockQuantity" required>
+            </div>
+            <button type="submit">저장</button>
+            <button type="button" id="cancel-btn" style="display:none; background-color: #6c757d;">취소</button>
+        </form>
 
-    <script src="/app.js"></script>
+        <div id="log-container">
+            <h2>서버 통신 로그</h2>
+            <div id="log"></div>
+        </div>
+    </div>
+</div>
+
+<script src="/app.js"></script>
+
 </body>
 </html>

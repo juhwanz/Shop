@@ -33,4 +33,10 @@ public class Product implements Serializable {
         if(this.stockQuantity - quantity <0) throw new SoldOutException("재고가 부족하여 주문에 실패했습니다.");
         this.stockQuantity -= quantity;
     }
+
+    public void update(String name, int price, int stockQuantity){
+        this.name = name;
+        this.price = price;
+        this.stockQuantity = stockQuantity;
+    }
 }

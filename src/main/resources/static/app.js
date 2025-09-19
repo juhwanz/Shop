@@ -1,79 +1,162 @@
-// app.js
-
-// HTML 문서가 모두 로드되면 이 함수를 실행합니다.
 document.addEventListener('DOMContentLoaded', function () {
-    const productIdSpan = document.getElementById('product-id');
-    const productNameSpan = document.getElementById('product-name');
-    const productPriceSpan = document.getElementById('product-price');
-    const stockQuantitySpan = document.getElementById('stock-quantity');
-    const orderBtn = document.getElementById('order-btn');
+    // --- HTML 요소 가져오기 ---
+    const productListBody = document.getElementById('product-list');
+    const productForm = document.getElementById('product-form');
     const logDiv = document.getElementById('log');
+    const productIdInput = document.getElementById('product-id');
+    const nameInput = document.getElementById('name');
+    const priceInput = document.getElementById('price');
+    const stockQuantityInput = document.getElementById('stockQuantity');
+    const cancelBtn = document.getElementById('cancel-btn');
 
-    // 테스트할 상품 ID (HTML에 있는 ID와 동일하게 설정)
-    const productId = productIdSpan.textContent;
+    const API_BASE_URL = '/api';
+
+    // --- 핵심 함수들 ---
 
     // 로그를 화면에 추가하는 함수
-    function addLog(message) {
-        logDiv.innerHTML += `<div>[${new Date().toLocaleTimeString()}] ${message}</div>`;
-        logDiv.scrollTop = logDiv.scrollHeight; // 항상 마지막 로그가 보이도록 스크롤
+    function addLog(message, isError = false) {
+        const logMessage = document.createElement('div');
+        const timestamp = new Date().toLocaleTimeString();
+        logMessage.innerHTML = `[${timestamp}] ${message}`;
+        if (isError) logMessage.style.color = 'red';
+        logDiv.appendChild(logMessage);
+        logDiv.scrollTop = logDiv.scrollHeight;
     }
 
-    // 상품 정보를 서버에서 가져와 화면을 업데이트하는 함수
-    async function fetchProductData() {
+    // 상품 목록을 서버에서 불러와 화면 테이블을 다시 그리는 함수
+    async function fetchProducts() {
+        addLog('상품 목록 로딩 중...');
         try {
-            const response = await fetch(`/api/products/${productId}`);
-            if (!response.ok) {
-                throw new Error(`상품 정보 조회 실패: ${response.status}`);
-            }
-            const product = await response.json();
+            const response = await fetch(`${API_BASE_URL}/products`);
+            if (!response.ok) throw new Error(`서버 응답 오류: ${response.status}`);
+            const products = await response.json();
 
-            // 가져온 데이터로 화면 업데이트
-            productNameSpan.textContent = product.name;
-            productPriceSpan.textContent = product.price;
-            stockQuantitySpan.textContent = product.stockQuantity;
-            addLog(`상품 정보 로드 완료: ${product.name}, 재고: ${product.stockQuantity}`);
-
+            productListBody.innerHTML = '';
+            products.forEach(product => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${product.id}</td>
+                    <td>${product.name}</td>
+                    <td>${product.price}</td>
+                    <td><strong>${product.stockQuantity}</strong></td>
+                    <td>
+                        <button class="order-btn" data-id="${product.id}">1개 주문</button>
+                        <button class="edit-btn" data-id="${product.id}">수정</button>
+                        <button class="delete-btn" data-id="${product.id}">삭제</button>
+                    </td>
+                `;
+                productListBody.appendChild(tr);
+            });
+            addLog('상품 목록 로딩 완료.');
         } catch (error) {
-            addLog(`오류 발생: ${error.message}`);
-            console.error(error);
+            addLog(`상품 목록 로딩 실패: ${error.message}`, true);
         }
     }
 
-    // 주문 버튼 클릭 시 실행될 함수
-    orderBtn.addEventListener('click', async () => {
-        addLog("주문 요청 시작...");
+    // 폼을 초기 상태로 리셋하는 함수
+    function resetForm() {
+        productForm.reset();
+        productIdInput.value = '';
+        cancelBtn.style.display = 'none';
+    }
+
+    // --- 이벤트 리스너 설정 ---
+
+    // 1. 상품 등록 / 수정 폼 제출 이벤트
+    productForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const id = productIdInput.value;
+        const productData = {
+            name: nameInput.value,
+            price: parseInt(priceInput.value),
+            stockQuantity: parseInt(stockQuantityInput.value)
+        };
+        const method = id ? 'PUT' : 'POST';
+        const url = id ? `${API_BASE_URL}/products/${id}` : `${API_BASE_URL}/products`;
+        const actionText = id ? '수정' : '등록';
+
+        addLog(`상품 ${actionText} 요청...`);
         try {
-            const orderRequest = {
-                userId: 99, // 임의의 사용자 ID
-                productId: productId,
-                quantity: 1
-            };
-
-            const response = await fetch('/api/orders', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(orderRequest)
+            const response = await fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(productData)
             });
-
             const responseBody = await response.text();
-
-            if (!response.ok) {
-                // 4xx, 5xx 에러 모두 여기서 처리
-                addLog(`<span style="color: red;">주문 실패: ${response.status} - ${responseBody}</span>`);
+            if (response.ok) {
+                addLog(responseBody);
+                resetForm();
+                await fetchProducts();
             } else {
-                addLog(`<span style="color: green;">${responseBody}</span>`);
-                // 주문 성공 후, 최신 재고 정보를 다시 가져옴
-                await fetchProductData();
+                addLog(`${actionText} 실패: ${response.status} - ${responseBody}`, true);
             }
-
         } catch (error) {
-            addLog(`네트워크 오류 발생: ${error.message}`);
-            console.error(error);
+            addLog(`네트워크 오류: ${error.message}`, true);
         }
     });
 
-    // 페이지가 처음 로드될 때 상품 정보를 가져옵니다.
-    fetchProductData();
+    // 2. 상품 목록 테이블 안의 버튼들에 대한 이벤트 (이벤트 위임)
+    productListBody.addEventListener('click', async (e) => {
+        const target = e.target;
+        if (target.tagName !== 'BUTTON') return;
+
+        const id = target.dataset.id;
+
+        // 주문 버튼
+        if (target.classList.contains('order-btn')) {
+            addLog(`${id}번 상품 1개 주문 요청...`);
+            try {
+                const response = await fetch(`${API_BASE_URL}/orders`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ userId: 99, productId: id, quantity: 1 })
+                });
+                const responseBody = await response.text();
+                if (!response.ok) {
+                    addLog(`주문 실패: ${response.status} - ${responseBody}`, true);
+                } else {
+                    addLog(responseBody);
+                    await fetchProducts();
+                }
+            } catch (error) {
+                addLog(`네트워크 오류: ${error.message}`, true);
+            }
+        }
+
+        // 수정 버튼
+        if (target.classList.contains('edit-btn')) {
+            const row = target.closest('tr');
+            productIdInput.value = id;
+            nameInput.value = row.cells[1].textContent;
+            priceInput.value = row.cells[2].textContent;
+            stockQuantityInput.value = row.cells[3].querySelector('strong').textContent;
+            cancelBtn.style.display = 'inline-block';
+            addLog(`${id}번 상품 정보를 수정 폼으로 불러왔습니다.`);
+        }
+
+        // 삭제 버튼
+        if (target.classList.contains('delete-btn')) {
+            if (confirm(`정말로 ID ${id} 상품을 삭제하시겠습니까?`)) {
+                addLog(`${id}번 상품 삭제 요청...`);
+                try {
+                    const response = await fetch(`${API_BASE_URL}/products/${id}`, { method: 'DELETE' });
+                    const responseBody = await response.text();
+                    if (response.ok) {
+                        addLog(responseBody);
+                        await fetchProducts();
+                    } else {
+                        addLog(`삭제 실패: ${response.status} - ${responseBody}`, true);
+                    }
+                } catch (error) {
+                    addLog(`네트워크 오류: ${error.message}`, true);
+                }
+            }
+        }
+    });
+
+    // 3. 취소 버튼 클릭 이벤트
+    cancelBtn.addEventListener('click', resetForm);
+
+    // --- 최초 실행 ---
+    fetchProducts();
 });
