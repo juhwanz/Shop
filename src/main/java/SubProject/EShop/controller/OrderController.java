@@ -1,6 +1,7 @@
 package SubProject.EShop.controller;
 
 import SubProject.EShop.dto.OrderRequestDto;
+import SubProject.EShop.service.OrderFacade;
 import SubProject.EShop.service.OrderService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -15,10 +16,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class OrderController {
 
     private final OrderService orderService;
+    private final OrderFacade orderFacade;
 
     @PostMapping
-    public ResponseEntity<String> placeOrder(@RequestBody OrderRequestDto requestDto){
-        Long orderId = orderService.placeOrder(requestDto);
+    public ResponseEntity<String> placeOrder(@RequestBody OrderRequestDto requestDto) throws InterruptedException{
+        Long orderId = orderFacade.placeOrder((requestDto));
         return ResponseEntity.ok("주문 성공. 주문 ID : " + orderId);
     }
 }

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>EShop</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            max-width: 600px;
+            margin: auto;
+        }.product {
+                     border: 1px solid #ccc;
+                     padding: 15px;
+                     margin-bottom: 20px;
+                     border-radius: 8px;
+                 }#log {
+                                       border: 1px solid #eee;
+                                       height: 200px;
+                                       overflow-y: scroll;
+                                       padding: 10px;
+                                       background: #f9f9f9;
+                                       font-size: 14px;
+                                       white-space: pre-wrap;
+                                   }
+       button {
+           padding: 10px 15px;
+           border: none;
+           background-color: #007bff;
+           color: white;
+           border-radius: 5px;
+           cursor: pointer;
+       }
+       button:hover {
+           background-color: #0056b3;
+       }
+
+    </style>
+</head>
+<body>
+    <h1> 실시간 재고 관리 시스템 테스트 </h1>
+
+    <div class="product">
+      <h2>상품 정도 (ID: <span id="product-id">1</span>)</h2>
+        <p><strong>상품명:</strong> <span id="product-name">로딩 중...</span></p>
+        <p><strong>가격:</strong> <span id="product-price">로딩 중...</span> 원</p>
+        <p><strong>남은 재고:</strong> <strong id="stock-quantity" style="color: blue; font-size: 1.2em;">로딩 중...</strong> 개</p>
+        <button id="order-btn">1개 주문하기 (동시 요청 테스트)</button>
+    </div>
+
+    <h3>실시간 서버 로그</h3>
+    <div id="log"></div>
+
+    <script src="/app.js"></script>
+</body>
+</html>
