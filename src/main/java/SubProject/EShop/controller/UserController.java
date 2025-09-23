@@ -1,5 +1,7 @@
 package SubProject.EShop.controller;
 
+import SubProject.EShop.domain.User;
+import SubProject.EShop.dto.UserLoginRequestDto;
 import SubProject.EShop.dto.UserSignupRequestDto;
 import SubProject.EShop.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,12 @@ public class UserController {
     @PostMapping("/signup")
     public ResponseEntity<String> signup(@RequestBody UserSignupRequestDto requestDto) {
         Long userId = userService.signup(requestDto);
-        return ResponseEntity.ok("회원가입 성공. 사용자 ID: "+ userId);
+        return ResponseEntity.ok("회원가입 성공. 사용자 ID: " + userId);
+    }
+
+    @PostMapping("/login")
+    public ResponseEntity<String> login(@RequestBody UserLoginRequestDto requestDto){
+        User user = userService.login(requestDto);
+        return ResponseEntity.ok("로그인 성공. 사용자 이름: " + user.getUsername());
     }
 }
