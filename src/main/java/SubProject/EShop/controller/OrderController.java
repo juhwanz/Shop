@@ -20,7 +20,12 @@ public class OrderController {
 
     @PostMapping
     public ResponseEntity<String> placeOrder(@RequestBody OrderRequestDto requestDto) throws InterruptedException{
-        Long orderId = orderFacade.placeOrder((requestDto));
-        return ResponseEntity.ok("주문 성공. 주문 ID : " + orderId);
+        try {
+            Long orderId = orderService.placeOrder(requestDto); // 👈 호출 대상 변경
+            return ResponseEntity.ok("주문 성공. 주문 ID : " + orderId);
+        } catch (RuntimeException e) {
+            // GlobalExceptionHandler가 처리하도록 예외를 그대로 던지는 것이 더 좋습니다.
+            throw e;
+        }
     }
 }

@@ -24,7 +24,7 @@ public class ProductService {
         return savedProduct.getId();
     }
 
-    @Cacheable(value = "products", key = "#productId")
+    //@Cacheable(value = "products", key = "#productId")
     public Product getProductById(Long productId) {
         System.out.println("DB에서 상품 정보를 조회합니다...");
         return productRepository.findById(productId)
