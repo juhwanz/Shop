@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     <td><strong>${product.stockQuantity}</strong></td>
                     <td>
                         <button class="order-btn" data-id="${product.id}">1개 주문</button>
+                        <button class="cart-btn" data-id="${product.id}">장바구니 담기</button>
                         <button class="edit-btn" data-id="${product.id}">수정</button>
                         <button class="delete-btn" data-id="${product.id}">삭제</button>
                     </td>
@@ -101,6 +102,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (target.tagName !== 'BUTTON') return;
 
         const id = target.dataset.id;
+        const TEST_USER_ID = 99; // 테스트용 사용자 ID
 
         // 주문 버튼
         if (target.classList.contains('order-btn')) {
@@ -109,7 +111,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const response = await fetch(`${API_BASE_URL}/orders`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ userId: 99, productId: id, quantity: 1 })
+                    body: JSON.stringify({ userId: TEST_USER_ID, productId: id, quantity: 1 })
                 });
                 const responseBody = await response.text();
                 if (!response.ok) {
@@ -117,6 +119,27 @@ document.addEventListener('DOMContentLoaded', function () {
                 } else {
                     addLog(responseBody);
                     await fetchProducts();
+                }
+            } catch (error) {
+                addLog(`네트워크 오류: ${error.message}`, true);
+            }
+        }
+
+        // --- '장바구니 담기' 버튼 로직 추가 ---
+        if (target.classList.contains('cart-btn')) {
+            addLog(`${id}번 상품 장바구니 추가 요청...`);
+            try {
+                const response = await fetch(`${API_BASE_URL}/carts/users/${TEST_USER_ID}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ productId: id, quantity: 1 }) // 1개씩 추가
+                });
+                const responseBody = await response.text();
+                if (!response.ok) {
+                    addLog(`장바구니 추가 실패: ${response.status} - ${responseBody}`, true);
+                } else {
+                    addLog(responseBody);
+                    // 장바구니에 담아도 재고는 변하지 않으므로, 목록을 새로고침할 필요는 없습니다.
                 }
             } catch (error) {
                 addLog(`네트워크 오류: ${error.message}`, true);
