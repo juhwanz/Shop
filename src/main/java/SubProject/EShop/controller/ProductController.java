@@ -6,6 +6,7 @@ import SubProject.EShop.dto.ProductUpdateRequestDto;
 import SubProject.EShop.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,7 +23,7 @@ public class ProductController {
 
     @Operation(summary = "상품 등록", description = "새로운 상품을 시스템에 등록합니다.")
     @PostMapping
-    public ResponseEntity<String> registerProduct(@RequestBody ProductRequestDto requestDto){
+    public ResponseEntity<String> registerProduct(@Valid @RequestBody ProductRequestDto requestDto){
         Long productId = productService.registerProduct(requestDto);
         return ResponseEntity.ok("상품 등록 완료. 상품 ID: " + productId);
     }
