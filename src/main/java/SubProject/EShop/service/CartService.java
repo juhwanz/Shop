@@ -21,14 +21,13 @@ public class CartService {
 
     private final CartRepository cartRepository;
     private final CartItemRepository cartItemRepository;
-    private final UserRepository userRepository;
+    //private final UserRepository userRepository;
     private final ProductRepository productRepository;
 
     @Transactional
-    public void addProductToCart(Long userId, CartItemRequestDto requestDto){
+    // Long userId 대신 User 객체를 직접 받도록(토큰화 하였기 때문에)
+    public void addProductToCart(User user, CartItemRequestDto requestDto){
         //사용자 & 상품 엔티티 조회
-        User user=  userRepository.findById(userId)
-                .orElseThrow( () -> new IllegalArgumentException("해당 사용자가 없습니다."));
         Product product = productRepository.findById(requestDto.getProductId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 상품이 없습니다."));
 
