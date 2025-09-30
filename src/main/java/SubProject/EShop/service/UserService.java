@@ -3,6 +3,8 @@ package SubProject.EShop.service;
 import SubProject.EShop.domain.User;
 import SubProject.EShop.dto.UserLoginRequestDto;
 import SubProject.EShop.dto.UserSignupRequestDto;
+import SubProject.EShop.exception.BusinessException;
+import SubProject.EShop.exception.ErrorCode;
 import SubProject.EShop.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -16,12 +18,10 @@ public class UserService {
 
     @Transactional
     public Long signup(UserSignupRequestDto requestDto){
-        //TODO 이메일 충복확인
-        /*
-        if(userRepository.existsByEmail(requestDto.getEmail())){
-            throw new IllegalArgumentException("이미 가입된 이메일입니다.")
-            }
-        */
+        // 이메일 중복 확인 로직
+        if(userRepository.findByEmail(requestDto.getEmail()).isPresent()){
+            throw new BusinessException(ErrorCode.EMAIL_DUPLICATION);
+        }
 
         //TODO 비밀번호 암호화
         //String encodedPassword = passwordEncoder.encode(requestDto.getPassword());
