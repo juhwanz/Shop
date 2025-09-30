@@ -27,7 +27,7 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody UserLoginRequestDto requestDto){
-        User user = userService.login(requestDto);
-        return ResponseEntity.ok("로그인 성공. 사용자 이름: " + user.getUsername());
+        String token = userService.login(requestDto);
+        return ResponseEntity.ok("로그인 성공. 사용자 이름: " + token);
     }
 }

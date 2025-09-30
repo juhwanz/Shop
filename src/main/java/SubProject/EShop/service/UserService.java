@@ -1,5 +1,6 @@
 package SubProject.EShop.service;
 
+import SubProject.EShop.config.JwtUtil;
 import SubProject.EShop.domain.User;
 import SubProject.EShop.dto.UserLoginRequestDto;
 import SubProject.EShop.dto.UserSignupRequestDto;
@@ -17,6 +18,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     @Transactional
     public Long signup(UserSignupRequestDto requestDto){
@@ -39,7 +41,7 @@ public class UserService {
     }
 
     @Transactional(readOnly = true) // 읽기 전용 트랜잭션
-    public User login(UserLoginRequestDto requestDto){
+    public String login(UserLoginRequestDto requestDto){
         // 1. email로 사용자 조회
         User user = userRepository.findByEmail(requestDto.getEmail())
                 .orElseThrow(() -> new IllegalArgumentException("가입되지 않은 이메일입니다."));
@@ -49,6 +51,6 @@ public class UserService {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
 
-        return user;
+        return jwtUtil.createToken(user.getEmail());
     }
 }
