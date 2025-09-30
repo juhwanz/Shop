@@ -125,13 +125,18 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         }
 
-        // --- '장바구니 담기' 버튼 로직 추가 ---
+        // --- '장바구니 담기' 버튼 로직 추가 (수정된 부분) ---
         if (target.classList.contains('cart-btn')) {
             addLog(`${id}번 상품 장바구니 추가 요청...`);
             try {
-                const response = await fetch(`${API_BASE_URL}/carts/users/${TEST_USER_ID}`, {
+                // 👇 API 호출 주소를 '/api/carts/items'로 수정
+                const response = await fetch(`${API_BASE_URL}/carts/items`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {
+                        'Content-Type': 'application/json'
+                        // TODO: 실제 로그인 기능 구현 후 JWT 토큰을 헤더에 추가해야 합니다.
+                        // 'Authorization': 'Bearer ' + localStorage.getItem('jwt-token')
+                    },
                     body: JSON.stringify({ productId: id, quantity: 1 }) // 1개씩 추가
                 });
                 const responseBody = await response.text();

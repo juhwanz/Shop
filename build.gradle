@@ -64,3 +64,9 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+// 이 부분이 핵심입니다. src/main/resources/static 폴더의 내용을 빌드 결과물에 포함시킵니다.
+processResources {
+	from('src/main/resources/static') {
+		into 'static'
+	}
+}
