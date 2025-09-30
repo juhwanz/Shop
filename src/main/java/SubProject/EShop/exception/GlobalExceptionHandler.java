@@ -1,6 +1,7 @@
 package SubProject.EShop.exception;
 
 import SubProject.EShop.dto.ErrorResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -11,6 +12,7 @@ import org.springframework.web.servlet.View;
 
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler{
 
@@ -23,6 +25,7 @@ public class GlobalExceptionHandler{
     // @Valid 유효성 검사 실패 시
     @ExceptionHandler(MethodArgumentNotValidException.class)
     protected ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e){
+        log.warn("handleMethodArgumentNotValidException", e); //Warn 레벨로 로그 기록
         final ErrorResponse response = new ErrorResponse(
                 ErrorCode.INVALID_INPUT_VALUE.getStatus().value(),
                 ErrorCode.INVALID_INPUT_VALUE.getCode(),
@@ -34,6 +37,7 @@ public class GlobalExceptionHandler{
     // 우리가 직접 정의한 비즈니스 예외 처리
     @ExceptionHandler(BusinessException.class)
     protected ResponseEntity<ErrorResponse> handleBusinessException(final BusinessException e){
+        log.warn("handleBusinessException", e); // WARN 레벨로 로그 기록
         final ErrorCode errorCode = e.getErrorCode();
         final ErrorResponse response = new ErrorResponse(
                 errorCode.getStatus().value(),
@@ -46,6 +50,7 @@ public class GlobalExceptionHandler{
     // 나머지 모든 예외 처리
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<ErrorResponse> handleException(Exception e){
+        log.error("handleEntityNotFoundException", e); // ERROR 레벨로 가장 심각한 예외 기록
         final ErrorResponse response = new ErrorResponse(
                 ErrorCode.INTERNAL_SERVER_ERROR.getStatus().value(),
                 ErrorCode.INTERNAL_SERVER_ERROR.getCode(),

@@ -4,6 +4,7 @@ import SubProject.EShop.domain.Product;
 import SubProject.EShop.dto.ProductRequestDto;
 import SubProject.EShop.dto.ProductUpdateRequestDto;
 import SubProject.EShop.repository.ProductRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ProductService {
@@ -26,7 +28,8 @@ public class ProductService {
 
     @Cacheable(value = "products", key = "#productId")
     public Product getProductById(Long productId) {
-        System.out.println("DB에서 상품 정보를 조회합니다...");
+        // systemout에서 log.info로 변환
+        log.info("DB에서 상품 정보를 조회합니다... 상품 ID: {}", productId);
         return productRepository.findById(productId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 상품이 없습니다."));
     }
