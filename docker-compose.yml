@@ -1,0 +1,38 @@
+services:
+  db:
+    image: mysql:8.0
+    container_name: eshop-db
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: ecommerce_db
+      MYSQL_ROOT_PASSWORD: password
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=mysql_native_password
+
+  redis:
+    image: redis:latest
+    container_name: eshop-redis
+    ports:
+      - "6379:6379"
+
+  app:
+    build: .
+    container_name: eshop-app
+    ports:
+      - "8080:8080"
+    # 단순한 문자열 목록 형식으로 수정
+    depends_on:
+      - db
+      - redis
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/ecommerce_db?useSSL=false&serverTimezone=Asia/Seoul
+      # 다시 root 계정을 사용하도록 수정
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: password
+      SPRING_DATA_REDIS_HOST: redis
+    # DB가 준비될 때까지 앱이 재시작하도록 하는 핵심 설정
+    restart: on-failure
+

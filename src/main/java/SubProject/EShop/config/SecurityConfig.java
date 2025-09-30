@@ -3,48 +3,41 @@ package SubProject.EShop.config;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+// 이 파일은 문제 진단을 위한 최소한의 설정입니다.
 @Configuration
-@EnableWebSecurity // Spring Security 활성화
+@EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    // private final JwtAuthenticationFilter jwtAuthenticationFilter; // 👈 일단 JWT 필터를 주석 처리하여 완전히 비활성화합니다.
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // 1. CSRF(Cross-Site Request Forgery) 보호 비활성화
                 .csrf(csrf -> csrf.disable())
-
-                // 2. 세션을 사용하지 않는 Stateless 설정
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
-                // 3. HTTP 요청에 대한 접근 권한 설정
+                // 모든 복잡한 설정을 제거하고, 오직 GET 요청만 허용하는 규칙을 적용합니다.
                 .authorizeHttpRequests(authz -> authz
-                        // 아래 URL은 인증 없이 누구나 접근 허용
-                        .requestMatchers("/api/users/signup", "/api/users/login", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                        // 그 외 모든 요청은 반드시 인증(로그인)을 거쳐야 함
-                        .anyRequest().authenticated()
-                )
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                        // GET 요청으로 "/", "/index.html", "/app.js" 주소에만 접근을 허용합니다.
+                        .requestMatchers(HttpMethod.GET, "/", "/index.html", "/app.js").permitAll()
+                        // 그 외 나머지 모든 요청은 일단 거부하여 원인을 명확히 합니다.
+                        .anyRequest().denyAll()
+                );
+        // .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // 👈 필터 적용을 비활성화합니다.
 
         return http.build();
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
-        //비밀번호 암호화를 위한 BCryptPasswordEncoder 빈 등록
+    public PasswordEncoder passwordEncoder() {
+        // PasswordEncoder는 다른 곳에서 필요할 수 있으므로 그대로 둡니다.
         return new BCryptPasswordEncoder();
     }
 }
-
-
 

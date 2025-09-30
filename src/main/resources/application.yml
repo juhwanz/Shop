@@ -1,15 +1,15 @@
 spring:
   data:
     redis:
-      host: localhost
+      host: redis # Docker 서비스 이름 사용
       port: 6379
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/ecommerce_db?useSSL=false&serverTimezone=Asia/Seoul
+    url: jdbc:mysql://db:3306/ecommerce_db?useSSL=false&serverTimezone=Asia/Seoul # 'localhost'를 'db'로 변경
     username: root
-    password:
+    password: password # docker-compose.yml과 일치
     hikari:
-      maximum-pool-size: 100 # 100개 설정 (유도)
+      maximum-pool-size: 100
 
   jpa:
     hibernate:
@@ -19,6 +19,8 @@ spring:
         show_sql: true
         format_sql: true
 
+# jwt 블록을 spring 블록 밖으로 꺼내서 독립적으로 배치합니다.
 jwt:
-  secret: V293LFRoaXMtaXMtYS1yZWFsbHktbG9uZy1zZWNyZXQta2V5LWZvci1qd3Qtc2VjdXJpdHkhISEK #??
+  secret: V293LFRoaXMtaXMtYS1yZWFsbHktbG9uZy1zZWNyZXQta2V5LWZvci1qd3Qtc2VjdXJpdHkhISEK # 이것은 JWT 토큰을 암호화하기 위한 '비밀 키'입니다.
   expiration-time: 86400000 # 24시간( 밀리초 단위)
+
